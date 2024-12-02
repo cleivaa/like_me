@@ -1,73 +1,43 @@
 const express = require("express");
-const fs = require("fs");
 const app = express();
 const PORT = 3000;
-const cors = require ('cors')
-const { Pool } = require('pg')
+const cors = require("cors");
+const { Pool } = require("pg");
+const { getPosts, createPost } = require("./src/consultas");
 
-
-
- // Iniciar el servidor con el el valor de puerto 3000 establecido al inicio de la declaracion de variables
- app.listen(PORT, () => {
+// Iniciar el servidor con el el valor de puerto 3000 establecido al inicio de la declaracion de variables
+app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
 
 // Middleware para manejar datos en formato JSON
 app.use(express.json());
 
- //Habilitamos cors
-app.use(cors())
-
-// Ruta del archivo JSON local
-const likeMePath = "./posts";
+//Habilitamos cors
+app.use(cors());
 
 // Middleware para servir archivos estáticos desde la carpeta "public"
 app.use(express.static("public"));
 
-// Función para leer el archivo JSON
-const leerPostLikes = () => {
-  const data = fs.readFileSync(likeMePath, "utf8");
-  return JSON.parse(data);
-};
-
-// Función para escribir en el archivo JSON
-const guardarPost = (data) => {
-    fs.writeFileSync(likeMePath, JSON.stringify(data, null, 2));
-  };
-
-  // Rutas
-
-// 1. GET /PostLikes - Devuelve los registros
-
-const obtenerPost = async () => {
-  const { rows } = await pool.query("SELECT * FROM posts")
-  console.log(rows)
-  return rows
+// 1. Obtener posts
+app.get("/posts", async (req, res) => {
+  try {
+    const posts = await getPosts();
+    res.json(posts);
+  } catch (error) {
+    res.status(500).send("Error al leer los post");
   }
-  obtenerPost()
+});
 
-  
-app.get("/posts", (req, res) => {
-    try {
-      const PostLikes = leerPostLikes();
-      res.json(PostLikes);
-    } catch (error) {
-      res.status(500).send("Error al leer los post");
-    }
-  });
-  
-  // 2. POST /PostLikes - Agrega un post
-    
-  app.post("/posts", (req, res) => {
-    try {
-      const nuevoPost = req.body;
-      const PostLikes = leerPostLikes();
-      PostLikes.push(nuevoPost);
-      guardarPost(PostLikes);
-      res.status(201).send("Post agregada correctamente");
-    } catch (error) {
-      res.status(500).send("Error al agregar el post");
-    }
-  });
+// 2. Agrega un post
+app.post("/posts", (req, res) => {
+  try {
+    const {titulo, url, descripcion} = req.body;
+    createPost(titulo, url, descripcion);
+    res.status(201).send("Post agregada correctamente");
+  } catch (error) {
+    res.status(500).send("Error al agregar el post");
+  }
+});
 
-module.exports 
+module.exports;

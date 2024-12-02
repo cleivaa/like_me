@@ -4,12 +4,19 @@ const pool = new Pool({
   host: "localhost",
   user: "postgres",
   password: "postgres",
-  database: "like_me",
+  database: "likeme",
   allowExitOnIdle: true,
 });
 
-const getDate = async () => {
-  const result = await pool.query("SELECT NOW()");
-  console.log(result);
+const getPosts = async () => {
+  const result = await pool.query("SELECT * FROM posts;");
+  return result.rows;
 };
-getDate();
+
+const createPost = async (titulo, url, descripcion) => {
+  const result =
+    await pool.query(`INSERT INTO posts (titulo, img, descripcion, likes)
+VALUES ('${titulo}', '${url}', '${descripcion}', 0); `);
+};
+
+module.exports = { getPosts, createPost };
