@@ -14,7 +14,7 @@ router.post('/posts', handleCreatePost)
 
 //router.delete('/posts/:id', handleDeletePost)
 
-//router.patch('/posts/:id', handleUpdatePost)
+router.patch('/posts/:id', handleUpdatePost)
 
 
 module.exports = router

@@ -19,4 +19,28 @@ const createPost = async (titulo, url, descripcion) => {
 VALUES ('${titulo}', '${url}', '${descripcion}', 0); `);
 };
 
-module.exports = { getPosts, createPost };
+const updatePosts = async (id, titulo, url, descripcion) => {
+  let query = "";
+  if (titulo) {
+    query = `titulo = '${titulo}'`;
+  }
+  if (url) {
+    query = `${query}, img = '${url}'`;
+  }
+  if (descripcion) {
+    query = `${query}, descripcion = '${descripcion}'`;
+  }
+  sentence = `UPDATE posts SET ${query} WHERE id = ${id}`;
+  const result = await pool.query(sentence);
+  return result
+};
+
+const deletePost = async (id) => {
+  const consulta = "DELETE FROM posts WHERE id = $1"
+  const values = [id]
+  const result = await pool.query(consulta, values)
+  return result
+  }
+  
+
+module.exports = { getPosts, createPost, updatePosts, deletePost};
